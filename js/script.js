@@ -224,9 +224,7 @@ function MascararTelefone(){
   value = value.replace(/(\d)(\d{4})$/,"$1-$2")
   inputTelefone.value = value;
 }
-inputTelefone.addEventListener("change", function (e) {
 
-});
 inputCidade.addEventListener("change", function (e) {
   ativaDesativaEnviar(validarVazio(e.target.value));
 });
