@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link href="css/styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="form-container">
+        <h2 class="mb-4">Formulário de Dados dos Alunos</h2>
+        <form  id="studantForm" >
+          <div class="row mb-3">
+            <div class="col-md-8">
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" class="form-control" id="nome" required minlength="3" />
+              <div class="valid-feedback"></div>
+              <div id="nome-erro-message" class="alert alert-danger" style="display: none">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="cpf" class="form-label">CPF</label>
+              <input
+                type="text"
+                class="form-control"
+                id="cpf"
+                required
+                maxlength="11"
+                minlength="11"
+              />
+              <div id="cpf-erro-message" class="alert alert-danger" style="display: none">
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="nascimento" class="form-label"
+                >Data de Nascimento</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                id="nascimento"
+                required
+              />
+            </div>
+
+            <div class="col-md-8">
+              <label for="email" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="email" required />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="telefone" class="form-label">Telefone</label>
+              <input type="text" class="form-control" id="telefone" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <label for="pais" class="form-label">Pais</label>
+              <input
+                type="text"
+                value="Brasil"
+                class="form-control"
+                id="pais"
+                required
+                disabled
+              />
+            </div>
+            <div class="col-md-5">
+              <label for="estado" class="form-label">Estado</label>
+              <select class="form-control" id="estado" required>
+                <option value="">Selecione um estado</option>
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espírito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+              </select>
+            </div>
+
+            <div class="col-md-5">
+              <label for="cidade" class="form-label">Cidade</label>
+              <input type="text" class="form-control" id="cidade" required />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <label for="prova1" class="form-label">Prova 1</label>
+              <input type="number" class="form-control" id="prova1" required />
+            </div>
+            <div class="col-md-2">
+              <label for="prova2" class="form-label">Prova 2</label>
+              <input type="number" class="form-control" id="prova2" required />
+            </div>
+          </div>
+          <button
+          disabled
+            type="button"
+            class="btn btn-primary"
+            onclick="enviarFormulario()"
+            id="enviar"
+          >
+            Enviar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="exportCSV()"
+          >
+            test csv
+          </button>
+        </form>
+      </div>
+
+      <div class="table-container mt-5">
+        <h2 class="mb-4">Tabela de Alunos</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Telefone</th>
+              <th>Email</th>
+              <th>Nascimento</th>
+              <th>Cidade</th>
+              <th>Estado</th>
+              <th>País</th>
+              <th>Nota 1</th>
+              <th>Nota 2</th>
+              <th>Média</th>
+              <th>Situação</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <!-- Dados dos alunos serão inseridos aqui vi JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script src="js/script.js"></script>
+</html>
