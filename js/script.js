@@ -17,6 +17,9 @@ inputCpf.addEventListener("change", MascararCPF)
 inputProva1.addEventListener("change",function (e) {ValidarNota("prova1",e.target)})
 inputProva2.addEventListener("change",function (e) {ValidarNota("prova2",e.target)})
 inputEmail.addEventListener("change", ValidarEmail);
+inputData.addEventListener("change",ValidarDataNascimento)
+inputTelefone.addEventListener("input", MascararTelefone)
+inputTelefone.addEventListener("change", ValidarTelefone)
 function DisplayInputFeedback(valido, input, errosDiv, erros){
   if(valido){
     errosDiv.style.display = "none";
@@ -63,7 +66,6 @@ function ValidarNome(){
   let valido = temAlgo && temSomenteLetras && temTamanhoMin
   DisplayInputFeedback(valido, inputNome, errosDiv, erros)
 }
-
 function ValidarCPF(){
   let errosDiv = document.getElementById("cpf-erro-message")
   errosDiv.innerHTML = ""
@@ -99,7 +101,6 @@ function ValidarCPF(){
   let valido = somenteNumeros && correctLength && validCPF
   DisplayInputFeedback(valido, inputCpf, errosDiv, erros)
 }
-
 function ValidarNota(id, input) {
   let errosDiv = document.getElementById(id + "-erro-message")
   errosDiv.innerHTML = ""
@@ -116,7 +117,6 @@ function ValidarNota(id, input) {
   let valido = esNumero && estaEntre
   DisplayInputFeedback(valido, input, errosDiv, erros)
 }
-
 function ValidarEmail(){
   let errosDiv = document.getElementById("email-erro-message")
   errosDiv.innerHTML = ""
@@ -160,12 +160,72 @@ function ValidarEmail(){
 
   }
 }
+function ValidarDataNascimento(){
+  let errosDiv = document.getElementById("data-erro-message")
+  errosDiv.innerHTML = ""
+  let erros = [""]
+  const partesData = inputData.value.split('-')
+  const data = { 
+    ano: partesData[0], 
+    mes: partesData[1], 
+    dia: partesData[2] 
+  }
+  
+  // Converte strings em número
+  const dia = parseInt(data.dia)
+  const mes = parseInt(data.mes)
+  const ano = parseInt(data.ano)
+  let anoValido = ano > 1920 && ano <= 2008 
+  if(!anoValido){
+    erros.push("O Ano de nascimento deve estar entre 1920 e 2008")
+  }
+  let valido = anoValido
+  DisplayInputFeedback(valido, inputData, errosDiv, erros)
+}
+function ValidarTelefone(){
+  // Remove caracteres não numéricos
+  let telefone = inputTelefone.value;
+  telefone = telefone.replace(/[^\d]+/g, "");
+  let errosDiv = document.getElementById("telefone-erro-message")
+  errosDiv.innerHTML = ""
+  erros = []
 
+  let tamanhoCorreto = telefone.length === 10 || telefone.length === 11
+  let numeroValido = false
+  if(!tamanhoCorreto) erros.push("Telefone deve ter 10 ou 11 numeros")
+  // Verifica se o telefone tem 10 ou 11 dígitos
+  else if (tamanhoCorreto) {
+    // Verifica se os dois primeiros dígitos são válidos (DDD)
+    const ddd = telefone.substring(0, 2);
+    if (/^\d{2}$/.test(ddd)) {
+      // Verifica se o número de telefone é válido
+      const numero = telefone.substring(2);
+      if (/^\d{8}$/.test(numero) || /^\d{9}$/.test(numero)) {
+        numeroValido = true;
+      }
+      else{
+        erros.push("Número Inválido")
+      }
+    }
+    else{
+      erros.push("DDD inválido")
+    }
+    
+  }
+  let valido = tamanhoCorreto 
+  DisplayInputFeedback(valido, inputTelefone, errosDiv, erros)
 
+}
+function MascararTelefone(){
+  let value = inputTelefone.value;
+  if (!value) return ""
+  value = value.replace(/\D/g,'')
+  value = value.replace(/(\d{2})(\d)/,"($1) $2")
+  value = value.replace(/(\d)(\d{4})$/,"$1-$2")
+  inputTelefone.value = value;
+}
 inputTelefone.addEventListener("change", function (e) {
-  ativaDesativaEnviar(validarVazio(e.target.value));
-  e.target.value = mascaraTelefone(e.target.value);
-  ativaDesativaEnviar(validarTelefone(e.target.value));
+
 });
 inputCidade.addEventListener("change", function (e) {
   ativaDesativaEnviar(validarVazio(e.target.value));
@@ -208,24 +268,7 @@ function validarVazio(campo) {
   }
 }
 
-function validarTelefone(telefone) {
-  // Remove caracteres não numéricos
-  telefone = telefone.replace(/[^\d]+/g, "");
 
-  // Verifica se o telefone tem 10 ou 11 dígitos
-  if (telefone.length === 10 || telefone.length === 11) {
-    // Verifica se os dois primeiros dígitos são válidos (DDD)
-    const ddd = telefone.substring(0, 2);
-    if (/^\d{2}$/.test(ddd)) {
-      // Verifica se o número de telefone é válido
-      const numero = telefone.substring(2);
-      if (/^\d{8}$/.test(numero) || /^\d{9}$/.test(numero)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
 function ativaDesativaEnviar(valor) {
   valor === true
@@ -233,22 +276,6 @@ function ativaDesativaEnviar(valor) {
     : document.getElementById("enviar").setAttribute("disabled", true);
 }
 
-function mascaraTelefone(telefone) {
-  // Remove caracteres não numéricos
-  telefone = telefone.replace(/[^\d]+/g, "");
-
-  // Verifica se o telefone tem 10 ou 11 dígitos
-  if (telefone.length === 10) {
-    // Formato para telefone com 8 dígitos
-    return telefone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  } else if (telefone.length === 11) {
-    // Formato para telefone com 9 dígitos
-    return telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-  } else {
-    // Retorna o telefone original se não tiver 10 ou 11 dígitos
-    return telefone;
-  }
-}
 
 const students = [];
 
