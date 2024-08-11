@@ -1,6 +1,6 @@
 var inputNome = document.getElementById("nome")
 var inputEmail = document.getElementById("email")
-var inputData = document.getElementById("data")
+var inputData = document.getElementById("nascimento")
 var inputTelefone = document.getElementById("telefone")
 var inputPais = document.getElementById("pais")
 var inputCidade = document.getElementById("cidade")
@@ -233,8 +233,6 @@ function ativaDesativaEnviar(valor) {
     : document.getElementById("enviar").setAttribute("disabled", true);
 }
 
-
-
 function mascaraTelefone(telefone) {
   // Remove caracteres não numéricos
   telefone = telefone.replace(/[^\d]+/g, "");
@@ -251,8 +249,6 @@ function mascaraTelefone(telefone) {
     return telefone;
   }
 }
-
-
 
 const students = [];
 
