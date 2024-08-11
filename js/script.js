@@ -8,7 +8,9 @@ var inputEstado = document.getElementById("estado")
 var inputCpf= document.getElementById("cpf")
 var inputProva1 = document.getElementById("prova1")
 var inputProva2 = document.getElementById("prova2")
-
+var listaInputs = [inputNome, inputEmail, inputData, inputTelefone, inputCidade, inputEstado, inputCpf, inputProva1, inputProva2]
+var form = document.getElementById("studantForm")
+var btnExporCsv = document.getElementById("btnExportCsv")
 
 inputNome.addEventListener("change",ValidarNome)
 inputCpf.addEventListener("focus", DesmascararCPF)
@@ -20,6 +22,20 @@ inputEmail.addEventListener("change", ValidarEmail);
 inputData.addEventListener("change",ValidarDataNascimento)
 inputTelefone.addEventListener("input", MascararTelefone)
 inputTelefone.addEventListener("change", ValidarTelefone)
+inputCidade.addEventListener("change", ValidarCidade)
+inputEstado.addEventListener("change", ValidarEstado)
+form.addEventListener("change", (event)=> {
+  let todosValidos = []
+  listaInputs.forEach((input) => {
+      todosValidos.push(input.classList.contains("is-valid"))
+    })
+  if (todosValidos.every(e => !!e)){
+    document.getElementById("enviar").removeAttribute("disabled")
+  }
+  else{
+    document.getElementById("enviar").setAttribute("disabled", true)
+  }
+  })
 function DisplayInputFeedback(valido, input, errosDiv, erros){
   if(valido){
     errosDiv.style.display = "none";
@@ -100,6 +116,19 @@ function ValidarCPF(){
     
   let valido = somenteNumeros && correctLength && validCPF
   DisplayInputFeedback(valido, inputCpf, errosDiv, erros)
+}
+function DesmascararCPF(){
+  if(inputCpf.mascarado){
+    inputCpf.value = inputCpf.value.replace(/\./g, "")
+    inputCpf.value = inputCpf.value.replace(/\-/, "")
+    inputCpf.mascarado = false;
+  } 
+}
+function MascararCPF() {
+  inputCpf.mascarado = true;
+  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d)/, "$1.$2");
+  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d)/, "$1.$2");
+  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 }
 function ValidarNota(id, input) {
   let errosDiv = document.getElementById(id + "-erro-message")
@@ -224,29 +253,37 @@ function MascararTelefone(){
   value = value.replace(/(\d)(\d{4})$/,"$1-$2")
   inputTelefone.value = value;
 }
+function ValidarCidade(){
+  let errosDiv = document.getElementById("cidade-erro-message")
+  errosDiv.innerHTML = ""
+  erros = []
 
-inputCidade.addEventListener("change", function (e) {
-  ativaDesativaEnviar(validarVazio(e.target.value));
-});
-inputEstado.addEventListener("change", function (e) {
-  ativaDesativaEnviar(validarVazio(e.target.value));
-});
-
-
-
-function DesmascararCPF(){
-  if(inputCpf.mascarado){
-    inputCpf.value = inputCpf.value.replace(/\./g, "")
-    inputCpf.value = inputCpf.value.replace(/\-/, "")
-    inputCpf.mascarado = false;
+  let temAlgo = validarVazio(inputCidade.value);
+  if (!temAlgo) {
+    erros.push("Não Pode estar Vazío")
   } 
+  let temSomenteLetras = validarSeNaotemNumeros(inputCidade.value)
+  if (!temSomenteLetras) {
+    erros.push("Cidade não pode ter números")
+  } 
+  let valido = temAlgo && temSomenteLetras
+  DisplayInputFeedback(valido, inputCidade, errosDiv, erros)
 }
+function ValidarEstado(){
+  let errosDiv = document.getElementById("estado-erro-message")
+  errosDiv.innerHTML = ""
+  erros = []
 
-function MascararCPF() {
-  inputCpf.mascarado = true;
-  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d)/, "$1.$2");
-  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d)/, "$1.$2");
-  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  let temAlgo = validarVazio(inputEstado.value);
+  if (!temAlgo) {
+    erros.push("Não Pode estar Vazío")
+  }
+  let temSomenteLetras = validarSeNaotemNumeros(inputEstado.value)
+  if (!temSomenteLetras) {
+    erros.push("Estado não pode ter números")
+  } 
+  let valido = temAlgo && temSomenteLetras
+  DisplayInputFeedback(valido, inputEstado, errosDiv, erros)
 }
 
 /*Funções de validação*/
@@ -265,17 +302,14 @@ function validarVazio(campo) {
     return false;
   }
 }
-
-
-
-function ativaDesativaEnviar(valor) {
+function ativaDesativaEnviar() {
   valor === true
     ? document.getElementById("enviar").removeAttribute("disabled")
     : document.getElementById("enviar").setAttribute("disabled", true);
 }
 
 
-const students = [];
+var students = [];
 
 class Studant {
   constructor(
@@ -351,10 +385,20 @@ function enviarFormulario() {
       Object.values(student).forEach((value) => {
         const cell = document.createElement("td");
         cell.textContent = value;
-        studentTableBody.appendChild(cell);
+        row.appendChild(cell);
       });
+      const excluir = document.createElement("td");
+      excluir.innerHTML = "<button class='btn btn-danger' >X</button>"
+      excluir.addEventListener("click", (e)=>{
+        studentTableBody.removeChild(row)
+        students = students.filter(function(item) {
+          return item !== student
+        })
+      });
+      row.appendChild(excluir)
       studentTableBody.appendChild(row);
-    });
+      btnExporCsv.removeAttribute("disabled");
+    })
   }
 }
 
@@ -366,7 +410,7 @@ function exportCSV(){
   const tabla = header.concat(rows)
   
   const csvContent = "data:text/csv;charset=utf-8," 
-  + tabla.map(e => e.join(";")).join("\n");
+  + tabla.map(e => e.join(",")).join("\n");
   var encodedUri = encodeURI(csvContent);
   window.open(encodedUri);
 }

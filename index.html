@@ -111,11 +111,13 @@
                 <option value="SE">Sergipe</option>
                 <option value="TO">Tocantins</option>
               </select>
+              <div id="estado-erro-message" class="alert alert-danger" style="display: none"></div>
             </div>
 
             <div class="col-md-5">
               <label for="cidade" class="form-label">Cidade</label>
               <input type="text" class="form-control" id="cidade" required />
+              <div id="cidade-erro-message" class="alert alert-danger" style="display: none"></div>
             </div>
           </div>
           <div class="row mb-3">
@@ -140,13 +142,7 @@
             Enviar
           </button>
 
-          <button
-            type="button"
-            class="btn btn-primary"
-            onclick="exportCSV()"
-          >
-            test csv
-          </button>
+          
         </form>
       </div>
 
@@ -155,7 +151,7 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>Nome</th>
+              <th>Nome</th> 
               <th>CPF</th>
               <th>Nascimento</th>
               <th>Email</th>
@@ -167,12 +163,22 @@
               <th>Nota 2</th>
               <th>Média</th>
               <th>Situação</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="studentTableBody">
             <!-- Dados dos alunos serão inseridos aqui vi JS -->
           </tbody>
         </table>
+        <button
+        id="btnExportCsv"
+            type="button"
+            class="btn btn-primary mb-4"
+            onclick="exportCSV()"
+            disabled
+          >
+            Baixar CSV
+          </button>
       </div>
     </div>
   </body>
