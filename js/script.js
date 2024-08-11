@@ -394,6 +394,7 @@ function enviarFormulario() {
         students = students.filter(function(item) {
           return item !== student
         })
+        if (students.length == 0) btnExporCsv.setAttribute("disabled");
       });
       row.appendChild(excluir)
       studentTableBody.appendChild(row);
