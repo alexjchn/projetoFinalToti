@@ -10,10 +10,13 @@ var inputProva1 = document.getElementById("prova1")
 var inputProva2 = document.getElementById("prova2")
 
 
-inputNome.addEventListener("change",ValidarNome);
+inputNome.addEventListener("change",ValidarNome)
 inputCpf.addEventListener("focus", DesmascararCPF)
 inputCpf.addEventListener("input",ValidarCPF)
-
+inputCpf.addEventListener("change", MascararCPF)
+inputProva1.addEventListener("change",function (e) {ValidarNota("prova1",e.target)})
+inputProva2.addEventListener("change",function (e) {ValidarNota("prova2",e.target)})
+inputEmail.addEventListener("change", ValidarEmail);
 function DisplayInputFeedback(valido, input, errosDiv, erros){
   if(valido){
     errosDiv.style.display = "none";
@@ -36,6 +39,9 @@ function DisplayInputFeedback(valido, input, errosDiv, erros){
   }
 }
 
+/**
+ * Validações do formulario
+ */
 function ValidarNome(){
   let errosDiv = document.getElementById("nome-erro-message")
   errosDiv.innerHTML = ""
@@ -94,20 +100,68 @@ function ValidarCPF(){
   DisplayInputFeedback(valido, inputCpf, errosDiv, erros)
 }
 
-inputCpf.addEventListener("change", function (e) {
-  e.target.value = mascararCPF(e.target.value);
-});
+function ValidarNota(id, input) {
+  let errosDiv = document.getElementById(id + "-erro-message")
+  errosDiv.innerHTML = ""
+  let erros = [""]
+  let nota = parseFloat(input.value)
+  let esNumero = typeof(nota) == "number"
+  if(!esNumero){
+    erros.push("Somente numeros são permitidos")
+  } 
+  let estaEntre = nota >= 0 && nota <= 10
+  if(!estaEntre) {
+    erros.push("A nota deve ser maior ou igual a 0 e menor ou igual a 10")
+  }
+  let valido = esNumero && estaEntre
+  DisplayInputFeedback(valido, input, errosDiv, erros)
+}
 
-inputProva1.addEventListener("change", function (e) {
-  ativaDesativaEnviar(validarNumero(e.target.value));
-});
-inputProva2.addEventListener("change", function (e) {
-  ativaDesativaEnviar(validarNumero(e.target.value));
-});
+function ValidarEmail(){
+  let errosDiv = document.getElementById("email-erro-message")
+  errosDiv.innerHTML = ""
 
-inputEmail.addEventListener("change", function (e) {
-  ativaDesativaEnviar(validarVazio(e.target.value));
-});
+  let email = inputEmail.value;
+
+  let vazioOuPequeno = (email == null) || (email.length < 4)
+
+  let partes = email.split('@');
+  let temDoisPartes = partes.length == 2
+  let  primeiraParteValida = false , partesDoDominio = false, dominioComDoisOuMaisPartes = false, partesDominioValidas = [true];
+  if(temDoisPartes){
+    let pre = partes[0];
+    primeiraParteValida = /^[a-zA-Z0-9_.-/+]+$/.test(pre)
+    
+    partesDoDominio = partes[1].split('.');
+    dominioComDoisOuMaisPartes =  partesDoDominio.length >= 2
+    if(dominioComDoisOuMaisPartes){
+      for ( let indice = 0; indice < partesDoDominio.length; indice++ )
+        {
+            let parteDoDominio = partesDoDominio[indice];
+            if (parteDoDominio.length == 0) {
+              partesDominioValidas.push(false);  
+              continue
+            }
+            if (!/^[a-zA-Z0-9-]+$/.test(parteDoDominio)){
+              partesDominioValidas.push(false);
+              continue
+            }
+            partesDominioValidas.push(true);
+        }
+    }
+    
+  }
+  let todasAsPartesValidas =partesDominioValidas.every(e => !!e) 
+  let valido =todasAsPartesValidas && !vazioOuPequeno && temDoisPartes && primeiraParteValida && dominioComDoisOuMaisPartes
+  if(valido){
+    DisplayInputFeedback(true, inputEmail,errosDiv,[])
+  }else{
+    DisplayInputFeedback(false, inputEmail,errosDiv,["Email Invalido"])
+
+  }
+}
+
+
 inputTelefone.addEventListener("change", function (e) {
   ativaDesativaEnviar(validarVazio(e.target.value));
   e.target.value = mascaraTelefone(e.target.value);
@@ -119,6 +173,86 @@ inputCidade.addEventListener("change", function (e) {
 inputEstado.addEventListener("change", function (e) {
   ativaDesativaEnviar(validarVazio(e.target.value));
 });
+
+
+
+function DesmascararCPF(){
+  if(inputCpf.mascarado){
+    inputCpf.value = inputCpf.value.replace(/\./g, "")
+    inputCpf.value = inputCpf.value.replace(/\-/, "")
+    inputCpf.mascarado = false;
+  } 
+}
+
+function MascararCPF() {
+  inputCpf.mascarado = true;
+  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d)/, "$1.$2");
+  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d)/, "$1.$2");
+  inputCpf.value = inputCpf.value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+/*Funções de validação*/
+
+function validarMinLength(input, min){
+  return input.length >= min 
+}
+function validarSeNaotemNumeros(input){
+  return !/[0-9]/.test(input)
+}
+function validarVazio(campo) {
+  // Verifica se o campo não está vazio
+  if (campo.trim() !== "") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function validarTelefone(telefone) {
+  // Remove caracteres não numéricos
+  telefone = telefone.replace(/[^\d]+/g, "");
+
+  // Verifica se o telefone tem 10 ou 11 dígitos
+  if (telefone.length === 10 || telefone.length === 11) {
+    // Verifica se os dois primeiros dígitos são válidos (DDD)
+    const ddd = telefone.substring(0, 2);
+    if (/^\d{2}$/.test(ddd)) {
+      // Verifica se o número de telefone é válido
+      const numero = telefone.substring(2);
+      if (/^\d{8}$/.test(numero) || /^\d{9}$/.test(numero)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function ativaDesativaEnviar(valor) {
+  valor === true
+    ? document.getElementById("enviar").removeAttribute("disabled")
+    : document.getElementById("enviar").setAttribute("disabled", true);
+}
+
+
+
+function mascaraTelefone(telefone) {
+  // Remove caracteres não numéricos
+  telefone = telefone.replace(/[^\d]+/g, "");
+
+  // Verifica se o telefone tem 10 ou 11 dígitos
+  if (telefone.length === 10) {
+    // Formato para telefone com 8 dígitos
+    return telefone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  } else if (telefone.length === 11) {
+    // Formato para telefone com 9 dígitos
+    return telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  } else {
+    // Retorna o telefone original se não tiver 10 ou 11 dígitos
+    return telefone;
+  }
+}
+
+
 
 const students = [];
 
@@ -203,89 +337,6 @@ function enviarFormulario() {
   }
 }
 
-function DesmascararCPF(){
-  if(inputCpf.mascarado){
-    inputCpf.value = inputCpf.value.replace(/\./g, "")
-    inputCpf.value = inputCpf.value.replace(/\-/, "")
-    inputCpf.mascarado = false;
-  } 
-}
-
-
-
-/*Funções de validação*/
-function validarNumero(numero) {
-  // Verifica se o número está entre 0 e 10
-  if (numero >= 0 && numero <= 10) {
-    return true;
-  } else {
-    return false;
-  }
-}
-function validarMinLength(input, min){
-  return input.length >= min 
-}
-function validarSeNaotemNumeros(input){
-  return !/[0-9]/.test(input)
-}
-function validarVazio(campo) {
-  // Verifica se o campo não está vazio
-  if (campo.trim() !== "") {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function validarTelefone(telefone) {
-  // Remove caracteres não numéricos
-  telefone = telefone.replace(/[^\d]+/g, "");
-
-  // Verifica se o telefone tem 10 ou 11 dígitos
-  if (telefone.length === 10 || telefone.length === 11) {
-    // Verifica se os dois primeiros dígitos são válidos (DDD)
-    const ddd = telefone.substring(0, 2);
-    if (/^\d{2}$/.test(ddd)) {
-      // Verifica se o número de telefone é válido
-      const numero = telefone.substring(2);
-      if (/^\d{8}$/.test(numero) || /^\d{9}$/.test(numero)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function ativaDesativaEnviar(valor) {
-  valor === true
-    ? document.getElementById("enviar").removeAttribute("disabled")
-    : document.getElementById("enviar").setAttribute("disabled", true);
-}
-
-
-function mascararCPF(input) {
-  inputCpf.mascarado = true;
-  input = input.replace(/(\d{3})(\d)/, "$1.$2");
-  input = input.replace(/(\d{3})(\d)/, "$1.$2");
-  input = input.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  return input;
-}
-function mascaraTelefone(telefone) {
-  // Remove caracteres não numéricos
-  telefone = telefone.replace(/[^\d]+/g, "");
-
-  // Verifica se o telefone tem 10 ou 11 dígitos
-  if (telefone.length === 10) {
-    // Formato para telefone com 8 dígitos
-    return telefone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  } else if (telefone.length === 11) {
-    // Formato para telefone com 9 dígitos
-    return telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-  } else {
-    // Retorna o telefone original se não tiver 10 ou 11 dígitos
-    return telefone;
-  }
-}
 function exportCSV(){
 
   const header = new Array(Object.keys(new Studant))

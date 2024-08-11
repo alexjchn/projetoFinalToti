@@ -54,6 +54,7 @@
             <div class="col-md-8">
               <label for="email" class="form-label">E-mail</label>
               <input type="email" class="form-control" id="email" required />
+              <div id="email-erro-message" class="alert alert-danger" style="display: none"></div>
             </div>
           </div>
           <div class="row mb-3">
@@ -116,11 +117,13 @@
           <div class="row mb-3">
             <div class="col-md-2">
               <label for="prova1" class="form-label">Prova 1</label>
-              <input type="number" class="form-control" id="prova1" required />
+              <input step=".25" min="0" max="10" type="number" class="form-control" id="prova1" required />
+              <div id="prova1-erro-message" class="alert alert-danger" style="display: none"></div>
             </div>
             <div class="col-md-2">
               <label for="prova2" class="form-label">Prova 2</label>
-              <input type="number" class="form-control" id="prova2" required />
+              <input step=".25" min="0" max="10" type="number" class="form-control" id="prova2" required />
+              <div id="prova2-erro-message" class="alert alert-danger" style="display: none"></div>
             </div>
           </div>
           <button
