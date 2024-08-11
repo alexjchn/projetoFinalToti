@@ -302,12 +302,6 @@ function validarVazio(campo) {
     return false;
   }
 }
-function ativaDesativaEnviar() {
-  valor === true
-    ? document.getElementById("enviar").removeAttribute("disabled")
-    : document.getElementById("enviar").setAttribute("disabled", true);
-}
-
 
 var students = [];
 
@@ -394,7 +388,7 @@ function enviarFormulario() {
         students = students.filter(function(item) {
           return item !== student
         })
-        if (students.length == 0) btnExporCsv.setAttribute("disabled");
+        if (students.length == 0) btnExporCsv.setAttribute("disabled", true);
       });
       row.appendChild(excluir)
       studentTableBody.appendChild(row);
